@@ -5,14 +5,19 @@ import { useApiConfig } from "@/config/useApiConfig";
 import { useConnectionTest } from "@/hooks/useConnectionTest";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FALLBACK_API_URL } from "@/config/constants";
+import { DEFAULT_API_URL } from "@/config/constants";
 
-/** First-run onboarding: prompt for the API URL before the app renders data. */
+/**
+ * First-run onboarding: prompt for the API URL before the app renders data.
+ * Only renders when the build-time default is explicitly empty and nothing is
+ * stored (an escape hatch); by default the demo uses `DEFAULT_API_URL` and
+ * skips this prompt entirely.
+ */
 export function OnboardingModal() {
   const { setBaseUrl } = useApiConfig();
   const test = useConnectionTest();
   const navigate = useNavigate();
-  const [draft, setDraft] = useState(FALLBACK_API_URL);
+  const [draft, setDraft] = useState(DEFAULT_API_URL || "https://terminschleuder.online");
 
   const confirm = () => {
     const trimmed = draft.trim().replace(/\/+$/, "");

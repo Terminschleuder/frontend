@@ -1,19 +1,23 @@
 /**
  * Build/runtime constants for the demo client.
  *
- * The API base URL is configured in the UI (Settings page), persisted to
- * localStorage. `VITE_DEFAULT_API_URL` can prefill a deployed demo so the
- * onboarding modal isn't required; the image stays origin-agnostic either way.
+ * The API base URL defaults to the public terminschleuder backend so the demo
+ * works out of the box with **no onboarding prompt**. It remains adjustable in
+ * the Settings page (persisted to localStorage). A build-time
+ * `VITE_DEFAULT_API_URL` overrides the built-in default (e.g. to point a
+ * deploy at a staging backend); the image stays origin-agnostic either way.
  */
 
 export const STORAGE_KEY = "terminschleuder.demo.apiBaseUrl";
 
-/** Default base URL when nothing is stored and no build-time default is set. */
-export const FALLBACK_API_URL = "http://localhost:8000";
-
-/** Build-time optional prefill (no rebuild needed to retarget at runtime). */
+/**
+ * Built-in default API base URL — the public terminschleuder backend. Used on
+ * first run (nothing in localStorage), so the demo renders data immediately
+ * without prompting. Override at build time with `VITE_DEFAULT_API_URL`
+ * (setting it to an empty string restores the first-run onboarding prompt).
+ */
 export const DEFAULT_API_URL: string =
-  import.meta.env.VITE_DEFAULT_API_URL ?? "";
+  import.meta.env.VITE_DEFAULT_API_URL ?? "https://terminschleuder.online";
 
 /** Map tile layer (OSM). Override via VITE_MAP_TILES_URL for a custom provider. */
 export const MAP_TILES_URL: string =

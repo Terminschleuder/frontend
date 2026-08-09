@@ -24,8 +24,9 @@ docker run --rm -p 5173:5173 -v "$(pwd):/app" -w /app node:22-alpine \
   sh -c "npm run dev -- --host 0.0.0.0"
 ```
 
-Then open http://localhost:5173, accept the onboarding modal (enter
-`http://localhost:8000`), and you're in.
+Then open http://localhost:5173. The demo defaults to the public backend
+(`https://terminschleuder.online`); to point it at your local backend, change the API
+URL in **Settings** to `http://localhost:8000`.
 
 ## Verification gate (before every commit)
 

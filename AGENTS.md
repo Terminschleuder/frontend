@@ -55,9 +55,10 @@ docker run --rm -v "$(pwd):/app" -w /app node:22-alpine sh -c "npm run build"
 ```
 
 The production image is built from `Dockerfile` (multi-stage `node` build → `nginx`
-serving static `dist/`); it is **origin-agnostic** — the API base URL is configured in
-the browser (Settings page / onboarding), persisted to `localStorage`, so one image
-runs against any backend with no rebuild.
+serving static `dist/`); it is **origin-agnostic** — it defaults to the public backend
+(`https://terminschleuder.online`) with no prompt, and the API base URL is adjustable in
+the browser (Settings page), persisted to `localStorage`, so one image runs against any
+backend with no rebuild.
 
 ## Verification gate (do this before committing)
 

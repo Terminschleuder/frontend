@@ -5,6 +5,7 @@ import { useConnectionTest } from "@/hooks/useConnectionTest";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { DEFAULT_API_URL } from "@/config/constants";
 import { joinUrl } from "@/lib/url";
 
 /** Every endpoint the demo calls — so the user sees exactly what's in use. */
@@ -69,7 +70,7 @@ export function SettingsPage() {
           <Input
             type="url"
             value={draft}
-            placeholder="http://localhost:8000"
+            placeholder={DEFAULT_API_URL}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && save()}
           />
@@ -83,8 +84,8 @@ export function SettingsPage() {
           <Button variant="outline" onClick={runTest} disabled={test.isPending}>
             {test.isPending ? "Testing…" : "Test connection"}
           </Button>
-          <Button variant="ghost" onClick={() => { clearBaseUrl(); setDraft(""); toast("Cleared — onboarding will show."); }}>
-            Clear
+          <Button variant="ghost" onClick={() => { clearBaseUrl(); toast.success(`Reset to the default API URL (${DEFAULT_API_URL}).`); }}>
+            Reset to default
           </Button>
         </div>
       </Card>

@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ApiConfigProvider } from "@/config/ApiConfigProvider";
 import { useApiConfig } from "@/config/useApiConfig";
-import { STORAGE_KEY, FALLBACK_API_URL } from "@/config/constants";
+import { STORAGE_KEY, DEFAULT_API_URL } from "@/config/constants";
 import { loadBaseUrl, saveBaseUrl, clearBaseUrl } from "@/config/storage";
 
 beforeEach(() => localStorage.clear());
@@ -39,10 +39,10 @@ function withQuery(ui: React.ReactElement) {
 }
 
 describe("ApiConfigProvider", () => {
-  it("falls back to the default URL and reports not-configured when empty", () => {
+  it("uses the built-in default URL and reports configured when nothing is stored", () => {
     const { getByTestId } = withQuery(<Probe />);
-    expect(getByTestId("url").textContent).toBe(FALLBACK_API_URL);
-    expect(getByTestId("configured").textContent).toBe("false");
+    expect(getByTestId("url").textContent).toBe(DEFAULT_API_URL);
+    expect(getByTestId("configured").textContent).toBe("true");
   });
 
   it("uses a stored URL and reports configured", () => {

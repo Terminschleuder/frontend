@@ -7,7 +7,9 @@ backend's `docs/api-reference.md`.
 ## Conventions
 
 - **Configurable base URL.** All requests go to the base URL set in the browser (Settings
-  page / onboarding), persisted to `localStorage`. `VITE_DEFAULT_API_URL` may prefill it.
+  page), persisted to `localStorage`, which overrides the built-in default
+  (`https://terminschleuder.online`). `VITE_DEFAULT_API_URL` may override that default at
+  build time.
 - **Read-only `GET` only.** The SPA never authenticates or writes; CORS is enabled for
   `GET/HEAD/OPTIONS` from all origins on the backend.
 - **Trailing slashes.** The client requests collection and detail URLs **with** a

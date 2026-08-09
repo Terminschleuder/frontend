@@ -1,9 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { ApiConfigContext, type ApiConfigValue } from "./ApiConfigContext";
-import {
-  DEFAULT_API_URL,
-  FALLBACK_API_URL,
-} from "./constants";
+import { DEFAULT_API_URL } from "./constants";
 import {
   clearBaseUrl as clearStored,
   loadBaseUrl,
@@ -16,14 +13,17 @@ interface ApiConfigProviderProps {
 
 /** Holds the configured API base URL in state, persisted to localStorage.
  *
- * On first load with no stored URL and no build-time default, `isConfigured`
- * is false so the app shows the onboarding modal before rendering data. */
+ * On first load with no stored URL, the built-in `DEFAULT_API_URL`
+ * (the public terminschleuder backend) is used and `isConfigured` is true, so
+ * the app renders data immediately — no onboarding prompt. The onboarding
+ * modal only appears if the build-time default is explicitly empty and
+ * nothing is stored. */
 export function ApiConfigProvider({ children }: ApiConfigProviderProps) {
   const [stored, setStored] = useState<string | null>(() => loadBaseUrl());
 
   const baseUrl = useMemo(() => {
     const raw = (stored ?? DEFAULT_API_URL ?? "").trim();
-    return (raw || FALLBACK_API_URL).replace(/\/+$/, "");
+    return (raw || DEFAULT_API_URL).replace(/\/+$/, "");
   }, [stored]);
 
   const isConfigured = useMemo(

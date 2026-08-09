@@ -11,10 +11,11 @@ date filters, ordering, pagination, organizations + their events, venues,
 categories, event detail with hero images and provenance — plus an interactive
 Leaflet map and geolocation.
 
-All configuration is done **in the UI** (Settings page / first-run onboarding):
-the demo user can see and change the API base URL, test the connection, and open
-the backend's self-describing OpenAPI / Swagger / ReDoc docs. The URL is
-persisted to `localStorage`, so one Docker image runs against any backend — no
+The demo **defaults to the public backend** (`https://terminschleuder.online`) and
+needs no setup — it renders data on first load with no prompt. The API base URL is
+**adjustable in the UI** (Settings page): the demo user can see and change it, test the
+connection, and open the backend's self-describing OpenAPI / Swagger / ReDoc docs. The
+URL is persisted to `localStorage`, so one Docker image runs against any backend — no
 rebuild needed to retarget.
 
 > This is a **completely distinct project** from `../backend` (own folder, own
@@ -80,9 +81,9 @@ docker run --rm -p 5173:5173 -v "$(pwd):/app" -w /app node:22-alpine \
 docker run --rm -v "$(pwd):/app" -w /app node:22-alpine sh -c "npm run gen:types"
 ```
 
-Open http://localhost:5173, accept the onboarding modal (enter
-`http://localhost:8000`), and click **Connect**. Change the API URL any time in
-**Settings** (gear icon).
+Open http://localhost:5173. The demo defaults to the public backend
+(`https://terminschleuder.online`); to point it at your local backend instead, change
+the API URL in **Settings** (gear icon) to `http://localhost:8000`.
 
 ## Scripts
 
@@ -169,11 +170,11 @@ build runs against a local, staging, or prod backend.
 ## Configuration
 
 All optional, build-time via `.env` (see [`.env.example`](.env.example)). The
-runtime API URL set in the browser always wins — these only prefill defaults.
+runtime API URL set in the browser always wins — these only override defaults.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `VITE_DEFAULT_API_URL` | `http://localhost:8000` | Prefills the onboarding modal's API URL. |
+| `VITE_DEFAULT_API_URL` | `https://terminschleuder.online` | Overrides the built-in default API URL used on first run (before the user sets one). Set to an empty string to restore the first-run onboarding prompt. |
 | `VITE_MAP_TILES_URL` | OpenStreetMap | Override the Leaflet tile layer. |
 
 ## Documentation
@@ -213,10 +214,11 @@ openapi.json    committed backend schema (offline codegen)
   the URL in Settings points at the backend (e.g. `http://localhost:8000`).
 - **Geolocation does nothing** — it requires a secure origin (`https://` or
   `localhost`); on plain HTTP non-localhost it silently won't work.
-- **Onboarding modal keeps reappearing** — the API URL is persisted to
-  `localStorage` under `terminschleuder.demo.apiBaseUrl`. If it's cleared or the
-  connection test fails, the modal re-prompts. Set `VITE_DEFAULT_API_URL` for a
-  known deploy to prefill it.
+- **Want the first-run onboarding prompt back?** — it's off by default because the
+  demo ships with a built-in API URL (`https://terminschleuder.online`). Set
+  `VITE_DEFAULT_API_URL=""` at build time to restore the prompt, or just change the
+  URL in Settings (persisted to `localStorage` under `terminschleuder.demo.apiBaseUrl`;
+  "Reset to default" there reverts to the built-in URL).
 - **No hero images / blank thumbnails** — events without a `hero_image` fall back
   to `/placeholder-hero.svg`; re-seed the backend with `seed_demo` (which
   generates a banner per event) to populate them.

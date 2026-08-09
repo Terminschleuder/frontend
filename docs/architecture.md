@@ -17,13 +17,17 @@ endpoints. There is intentionally no register/login/token/api-keys UI — those 
 ## The defining constraint: origin-agnostic, runtime-configured API URL
 
 A single built image must run against *any* backend (local, staging, prod) with no
-rebuild. The API base URL is therefore **not** baked in at build time. Instead:
+rebuild. The API base URL is therefore adjustable at runtime, not fixed per deploy:
 
-- On first load, an **onboarding modal** asks for the API URL and tests the connection.
-- The URL is persisted to `localStorage` (`terminschleuder.demo.apiBaseUrl`).
-- It can be changed any time from the **Settings** page (gear icon).
-- `VITE_DEFAULT_API_URL` may *prefill* the modal for a known deploy, but the runtime
-  value in `localStorage` always wins — the image stays origin-agnostic either way.
+- The demo ships with a **built-in default** (`https://terminschleuder.online`) so it
+  renders data on first load with **no onboarding prompt**.
+- A user-set URL is persisted to `localStorage` (`terminschleuder.demo.apiBaseUrl`) and
+  always wins over the built-in default.
+- It can be changed any time from the **Settings** page (gear icon); "Reset to default"
+  reverts to the built-in URL.
+- `VITE_DEFAULT_API_URL` overrides the built-in default at build time (e.g. to point a
+  deploy at a staging backend, or set it to `""` to restore the first-run onboarding
+  prompt) — but the runtime value in `localStorage` always wins.
 
 The backend enables CORS for read-only `GET/HEAD/OPTIONS` from all origins, so the SPA
 calls the configured URL directly from the browser (no same-origin proxy needed). An
@@ -104,12 +108,13 @@ Key points:
 
 ## Configuration
 
-All optional, build-time via `.env` (see `.env.example`). The runtime API URL in the
-browser always wins.
+All optional, build-time via `.env` (see `.env.example`). The runtime API URL set in
+the browser always wins — these only override the built-in default
+(`https://terminschleuder.online`).
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `VITE_DEFAULT_API_URL` | `http://localhost:8000` | Prefills the onboarding modal's API URL. |
+| `VITE_DEFAULT_API_URL` | `https://terminschleuder.online` | Overrides the built-in default API URL used on first run. Set to `""` to restore the first-run onboarding prompt. |
 | `VITE_MAP_TILES_URL` | OpenStreetMap | Override the Leaflet tile layer. |
 
 ## OpenAPI → TypeScript codegen
