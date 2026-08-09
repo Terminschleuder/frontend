@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-ssr
+.git
+.gitignore
+coverage
+*.log
+npm-debug.log*
+.DS_Store
+README.md
+.env
+.env.*
+.openapi.json
+vitest.config.ts
+eslint.config.js
+.prettierrc

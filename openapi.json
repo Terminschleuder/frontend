@@ -1,0 +1,4425 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "terminschleuder API",
+        "version": "alpha-0.01",
+        "description": "A Django + DRF backend for local events and meetups with PostGIS geospatial search and ingestion/provenance. This schema describes the public, read-only catalog surface a client (e.g. the demo SPA) consumes."
+    },
+    "paths": {
+        "/api/auth/api-keys/": {
+            "get": {
+                "operationId": "auth_api_keys_list",
+                "description": "GET/POST /api/auth/api-keys/ — list and create your own API keys.\n\nThe raw key is returned only on creation (never on list).",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedAPIKeyList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "auth_api_keys_create",
+                "description": "GET/POST /api/auth/api-keys/ — list and create your own API keys.\n\nThe raw key is returned only on creation (never on list).",
+                "tags": [
+                    "auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/APIKeyCreateRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/APIKeyCreateRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/APIKeyCreateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIKeyCreate"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/auth/api-keys/{id}/": {
+            "get": {
+                "operationId": "auth_api_keys_retrieve",
+                "description": "GET/DELETE /api/auth/api-keys/<id>/ — revoke (delete) one of your keys.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIKey"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "auth_api_keys_destroy",
+                "description": "GET/DELETE /api/auth/api-keys/<id>/ — revoke (delete) one of your keys.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/auth/login/": {
+            "post": {
+                "operationId": "auth_login_create",
+                "description": "POST /api/auth/login/ — session-based login (admin / browser).",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/auth/logout/": {
+            "post": {
+                "operationId": "auth_logout_create",
+                "description": "POST /api/auth/logout/ — end the session.",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/auth/me/": {
+            "get": {
+                "operationId": "auth_me_retrieve",
+                "description": "GET /api/auth/me/ — return the currently authenticated user.",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/auth/register/": {
+            "post": {
+                "operationId": "auth_register_create",
+                "description": "POST /api/auth/register/ — create a new user account.",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/auth/token/": {
+            "post": {
+                "operationId": "auth_token_create",
+                "description": "Takes a set of user credentials and returns an access and refresh JSON web\ntoken pair to prove the authentication of those credentials.",
+                "tags": [
+                    "auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenObtainPairRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenObtainPairRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenObtainPairRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenObtainPair"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/auth/token/refresh/": {
+            "post": {
+                "operationId": "auth_token_refresh_create",
+                "description": "Takes a refresh type JSON web token and returns an access type JSON web\ntoken if the refresh token is valid.",
+                "tags": [
+                    "auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenRefreshRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenRefreshRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenRefreshRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenRefresh"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/categories/": {
+            "get": {
+                "operationId": "categories_list",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedCategoryList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "categories_create",
+                "tags": [
+                    "categories"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/categories/{id}/": {
+            "get": {
+                "operationId": "categories_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this category.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "categories_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this category.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CategoryRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "categories_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this category.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCategoryRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCategoryRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Category"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "categories_destroy",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this category.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/cities/": {
+            "get": {
+                "operationId": "cities_list",
+                "description": "Read-only city catalog.\n\n- Search: ``?search=<text>`` matches the city name (prefix/contains).\n- Filter: ``?country_code=DE``.\n- Order:  ``?ordering=name`` (default) or ``?ordering=-population``.\n- Page size: ``?page_size=<n>`` (capped at 1000).\n- Full list (no pagination): ``/api/cities/all/`` — returns every active\n  city in one response, for clients that want to cache the whole catalog\n  (e.g. an offline pick-list / autocomplete).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "country_code",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "cities"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedCityList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/cities/{id}/": {
+            "get": {
+                "operationId": "cities_retrieve",
+                "description": "Read-only city catalog.\n\n- Search: ``?search=<text>`` matches the city name (prefix/contains).\n- Filter: ``?country_code=DE``.\n- Order:  ``?ordering=name`` (default) or ``?ordering=-population``.\n- Page size: ``?page_size=<n>`` (capped at 1000).\n- Full list (no pagination): ``/api/cities/all/`` — returns every active\n  city in one response, for clients that want to cache the whole catalog\n  (e.g. an offline pick-list / autocomplete).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this city.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "cities"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/City"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/cities/all/": {
+            "get": {
+                "operationId": "cities_all_retrieve",
+                "description": "Return every active city in a single unpaginated response.",
+                "tags": [
+                    "cities"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/City"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/events/": {
+            "get": {
+                "operationId": "events_list",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "attendance_mode",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "hybrid",
+                                "online",
+                                "physical"
+                            ]
+                        },
+                        "description": "* `physical` - Physical\n* `online` - Online\n* `hybrid` - Hybrid"
+                    },
+                    {
+                        "in": "query",
+                        "name": "category",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "category__slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "city",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "event_type",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "conference",
+                                "meetup",
+                                "other",
+                                "social",
+                                "workshop"
+                            ]
+                        },
+                        "description": "* `meetup` - Meetup\n* `conference` - Conference\n* `workshop` - Workshop\n* `social` - Social\n* `other` - Other"
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "organization",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "organization_slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "starts_at_after",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "starts_at_before",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "archived",
+                                "cancelled",
+                                "draft",
+                                "published"
+                            ]
+                        },
+                        "description": "* `draft` - Draft\n* `published` - Published\n* `cancelled` - Cancelled\n* `archived` - Archived"
+                    },
+                    {
+                        "in": "query",
+                        "name": "venue",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedEventList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "events_create",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/": {
+            "get": {
+                "operationId": "events_retrieve",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "events_update",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "events_partial_update",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedEventRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "events_destroy",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/archive/": {
+            "post": {
+                "operationId": "events_archive_create",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/cancel/": {
+            "post": {
+                "operationId": "events_cancel_create",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/publish/": {
+            "post": {
+                "operationId": "events_publish_create",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/revert_to_draft/": {
+            "post": {
+                "operationId": "events_revert_to_draft_create",
+                "description": "List, create, retrieve, update and destroy events.\n\n- Filter: ``?category=<id>&category__slug=<slug>&city=<city>&organization=<id>&\n  organization_slug=<slug>&event_type=<…>&attendance_mode=<…>&status=<…>&\n  starts_at_after=&starts_at_before=``\n- Search: ``?search=<text>`` matches title and description.\n- Order:  ``?ordering=starts_at`` (or ``-starts_at``).\n- Proximity: ``?lat=<lat>&lon=<lon>&radius_km=<km>`` (or ``?near_city=<slug>``)\n  returns events within the radius, each annotated with a ``distance`` (km),\n  ordered nearest-first. **Online events are excluded** from proximity.\n- Lifecycle actions: ``POST /api/events/<id>/publish/``,\n  ``/cancel/``, ``/archive/``, ``/revert_to_draft/`` (owner / ``owner_group``\n  member / holder of ``events.change_event``).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Event"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/ingestion/observations/": {
+            "get": {
+                "operationId": "ingestion_observations_list",
+                "description": "Submit and read untrusted event observations.\n\n``POST`` submits one observation (forced ``status=pending``); ``bulk/``\nsubmits a list transactionally. List/retrieve let the extractor confirm what\nit submitted. Reviewing/promoting is an operator action in the admin.",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "run",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "source",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "accepted",
+                                "pending",
+                                "promoted",
+                                "rejected"
+                            ]
+                        },
+                        "description": "* `pending` - Pending\n* `accepted` - Accepted\n* `rejected` - Rejected\n* `promoted` - Promoted"
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedEventObservationList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "ingestion_observations_create",
+                "description": "Submit and read untrusted event observations.\n\n``POST`` submits one observation (forced ``status=pending``); ``bulk/``\nsubmits a list transactionally. List/retrieve let the extractor confirm what\nit submitted. Reviewing/promoting is an operator action in the admin.",
+                "tags": [
+                    "ingestion"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventObservationSubmitRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventObservationSubmitRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EventObservationSubmitRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventObservationSubmit"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/ingestion/observations/{id}/": {
+            "get": {
+                "operationId": "ingestion_observations_retrieve",
+                "description": "Submit and read untrusted event observations.\n\n``POST`` submits one observation (forced ``status=pending``); ``bulk/``\nsubmits a list transactionally. List/retrieve let the extractor confirm what\nit submitted. Reviewing/promoting is an operator action in the admin.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this event observation.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventObservation"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/ingestion/observations/bulk/": {
+            "post": {
+                "operationId": "ingestion_observations_bulk_create",
+                "description": "Submit and read untrusted event observations.\n\n``POST`` submits one observation (forced ``status=pending``); ``bulk/``\nsubmits a list transactionally. List/retrieve let the extractor confirm what\nit submitted. Reviewing/promoting is an operator action in the admin.",
+                "tags": [
+                    "ingestion"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventObservation"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/ingestion/runs/": {
+            "get": {
+                "operationId": "ingestion_runs_list",
+                "description": "Report ingestion runs.\n\n``POST`` creates a run (defaults to ``running``, ``reported_by`` = caller);\n``PATCH`` (or the ``/success/`` / ``/failure/`` actions) finishes it. Finishing\na run also stamps its source's ``last_fetched_at`` / ``next_due_at`` schedule.",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedIngestionRunList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "ingestion_runs_create",
+                "description": "Report ingestion runs.\n\n``POST`` creates a run (defaults to ``running``, ``reported_by`` = caller);\n``PATCH`` (or the ``/success/`` / ``/failure/`` actions) finishes it. Finishing\na run also stamps its source's ``last_fetched_at`` / ``next_due_at`` schedule.",
+                "tags": [
+                    "ingestion"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestionRun"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/ingestion/runs/{id}/": {
+            "get": {
+                "operationId": "ingestion_runs_retrieve",
+                "description": "Report ingestion runs.\n\n``POST`` creates a run (defaults to ``running``, ``reported_by`` = caller);\n``PATCH`` (or the ``/success/`` / ``/failure/`` actions) finishes it. Finishing\na run also stamps its source's ``last_fetched_at`` / ``next_due_at`` schedule.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ingestion run.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestionRun"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "ingestion_runs_update",
+                "description": "Report ingestion runs.\n\n``POST`` creates a run (defaults to ``running``, ``reported_by`` = caller);\n``PATCH`` (or the ``/success/`` / ``/failure/`` actions) finishes it. Finishing\na run also stamps its source's ``last_fetched_at`` / ``next_due_at`` schedule.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ingestion run.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestionRun"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "ingestion_runs_partial_update",
+                "description": "Report ingestion runs.\n\n``POST`` creates a run (defaults to ``running``, ``reported_by`` = caller);\n``PATCH`` (or the ``/success/`` / ``/failure/`` actions) finishes it. Finishing\na run also stamps its source's ``last_fetched_at`` / ``next_due_at`` schedule.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ingestion run.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedIngestionRunRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedIngestionRunRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedIngestionRunRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestionRun"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "ingestion_runs_destroy",
+                "description": "Report ingestion runs.\n\n``POST`` creates a run (defaults to ``running``, ``reported_by`` = caller);\n``PATCH`` (or the ``/success/`` / ``/failure/`` actions) finishes it. Finishing\na run also stamps its source's ``last_fetched_at`` / ``next_due_at`` schedule.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ingestion run.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/ingestion/runs/{id}/failure/": {
+            "post": {
+                "operationId": "ingestion_runs_failure_create",
+                "description": "``POST /api/ingestion/runs/<id>/failure/`` — mark the run failed.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ingestion run.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestionRun"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/ingestion/runs/{id}/success/": {
+            "post": {
+                "operationId": "ingestion_runs_success_create",
+                "description": "``POST /api/ingestion/runs/<id>/success/`` — mark the run succeeded.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this ingestion run.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IngestionRunRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngestionRun"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/ingestion/sources/due/": {
+            "get": {
+                "operationId": "ingestion_sources_due_list",
+                "description": "``GET /api/ingestion/sources/due/`` — the extractor's work queue.\n\nApproved, active sources due for a fetch, ordered so never-fetched sources\n(``next_due_at`` is null) come first, then by soonest due time.",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "ingestion"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedDueSourceList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/organizations/": {
+            "get": {
+                "operationId": "organizations_list",
+                "description": "Public, read-only organization catalog.\n\nOnly active organizations are listed. An organization's events are available\nvia the ``/events/`` detail action (published only, with proximity support).",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "organizations"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedOrganizationPublicList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/organizations/{slug}/": {
+            "get": {
+                "operationId": "organizations_retrieve",
+                "description": "Public, read-only organization catalog.\n\nOnly active organizations are listed. An organization's events are available\nvia the ``/events/`` detail action (published only, with proximity support).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "organizations"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationPublic"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/organizations/{slug}/events/": {
+            "get": {
+                "operationId": "organizations_events_retrieve",
+                "description": "Public, read-only organization catalog.\n\nOnly active organizations are listed. An organization's events are available\nvia the ``/events/`` detail action (published only, with proximity support).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "organizations"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationPublic"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/schema/": {
+            "get": {
+                "operationId": "schema_retrieve",
+                "description": "OpenApi3 schema for this API. Format can be selected via content negotiation.\n\n- YAML: application/vnd.oai.openapi\n- JSON: application/vnd.oai.openapi+json",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "format",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "json",
+                                "yaml"
+                            ]
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "lang",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "af",
+                                "ar",
+                                "ar-dz",
+                                "ast",
+                                "az",
+                                "be",
+                                "bg",
+                                "bn",
+                                "br",
+                                "bs",
+                                "ca",
+                                "ckb",
+                                "cs",
+                                "cy",
+                                "da",
+                                "de",
+                                "dsb",
+                                "el",
+                                "en",
+                                "en-au",
+                                "en-gb",
+                                "eo",
+                                "es",
+                                "es-ar",
+                                "es-co",
+                                "es-mx",
+                                "es-ni",
+                                "es-ve",
+                                "et",
+                                "eu",
+                                "fa",
+                                "fi",
+                                "fr",
+                                "fy",
+                                "ga",
+                                "gd",
+                                "gl",
+                                "he",
+                                "hi",
+                                "hr",
+                                "hsb",
+                                "ht",
+                                "hu",
+                                "hy",
+                                "ia",
+                                "id",
+                                "ig",
+                                "io",
+                                "is",
+                                "it",
+                                "ja",
+                                "ka",
+                                "kab",
+                                "kk",
+                                "km",
+                                "kn",
+                                "ko",
+                                "ky",
+                                "lb",
+                                "lt",
+                                "lv",
+                                "mk",
+                                "ml",
+                                "mn",
+                                "mr",
+                                "ms",
+                                "my",
+                                "nb",
+                                "ne",
+                                "nl",
+                                "nn",
+                                "os",
+                                "pa",
+                                "pl",
+                                "pt",
+                                "pt-br",
+                                "ro",
+                                "ru",
+                                "sk",
+                                "sl",
+                                "sq",
+                                "sr",
+                                "sr-latn",
+                                "sv",
+                                "sw",
+                                "ta",
+                                "te",
+                                "tg",
+                                "th",
+                                "tk",
+                                "tr",
+                                "tt",
+                                "udm",
+                                "ug",
+                                "uk",
+                                "ur",
+                                "uz",
+                                "vi",
+                                "zh-hans",
+                                "zh-hant"
+                            ]
+                        }
+                    }
+                ],
+                "tags": [
+                    "schema"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/vnd.oai.openapi": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            },
+                            "application/yaml": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            },
+                            "application/vnd.oai.openapi+json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {}
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/venues/": {
+            "get": {
+                "operationId": "venues_list",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "city",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page_size",
+                        "required": false,
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "venues"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedVenueList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "venues_create",
+                "tags": [
+                    "venues"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VenueRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VenueRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VenueRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Venue"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/venues/{id}/": {
+            "get": {
+                "operationId": "venues_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this venue.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "venues"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Venue"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "venues_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this venue.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "venues"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VenueRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VenueRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VenueRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Venue"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "venues_partial_update",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this venue.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "venues"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVenueRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVenueRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVenueRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Venue"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "venues_destroy",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this venue.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "venues"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "APIKey": {
+                "type": "object",
+                "description": "Read serializer for API keys (never exposes the raw key).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Label for this key.",
+                        "maxLength": 120
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Public prefix to identify the key."
+                    },
+                    "created": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "revoked": {
+                        "type": "boolean",
+                        "readOnly": true
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "created",
+                    "expires_at",
+                    "id",
+                    "name",
+                    "prefix",
+                    "revoked"
+                ]
+            },
+            "APIKeyCreate": {
+                "type": "object",
+                "description": "Create serializer; returns the raw key exactly once in ``key``.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Label for this key.",
+                        "maxLength": 120
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Public prefix to identify the key."
+                    },
+                    "created": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "key": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created",
+                    "id",
+                    "key",
+                    "name",
+                    "prefix"
+                ]
+            },
+            "APIKeyCreateRequest": {
+                "type": "object",
+                "description": "Create serializer; returns the raw key exactly once in ``key``.",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Label for this key.",
+                        "maxLength": 120
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "AttendanceModeEnum": {
+                "enum": [
+                    "physical",
+                    "online",
+                    "hybrid"
+                ],
+                "type": "string",
+                "description": "* `physical` - Physical\n* `online` - Online\n* `hybrid` - Hybrid"
+            },
+            "Category": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ]
+            },
+            "CategoryRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "City": {
+                "type": "object",
+                "description": "Read-only representation of a city, exposing its centroid as lat/lon.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "geoname_id": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true,
+                        "description": "Stable GeoNames id; idempotency key for re-seeding."
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "country": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "country_code": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "latitude": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "longitude": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "default_radius_km": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "description": "Suggested search radius (km) for ?near_city=."
+                    },
+                    "population": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "country",
+                    "country_code",
+                    "default_radius_km",
+                    "geoname_id",
+                    "id",
+                    "latitude",
+                    "longitude",
+                    "name",
+                    "population",
+                    "slug",
+                    "timezone"
+                ]
+            },
+            "DueSource": {
+                "type": "object",
+                "description": "A source eligible for extraction (approved + active + due).\n\nRead-only; this is the extractor's work queue.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "organization": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/_OrganizationMini"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true
+                    },
+                    "platform": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Where the source lives, e.g. 'meetup', 'eventbrite', 'homepage'."
+                    },
+                    "fetch_interval_minutes": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "description": "How often the extractor should revisit this source."
+                    },
+                    "last_fetched_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "next_due_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "fetch_interval_minutes",
+                    "id",
+                    "last_fetched_at",
+                    "next_due_at",
+                    "organization",
+                    "platform",
+                    "url"
+                ]
+            },
+            "Event": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "hero_image": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true
+                    },
+                    "venue": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Venue"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "organization": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrganizationPublic"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Category"
+                        },
+                        "readOnly": true
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/EventStatusEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "event_type": {
+                        "$ref": "#/components/schemas/EventTypeEnum"
+                    },
+                    "attendance_mode": {
+                        "$ref": "#/components/schemas/AttendanceModeEnum"
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "cancelled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "original_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 200
+                    },
+                    "original_platform": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "source": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/EventSourceNested"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "promoted_from": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/EventObservationNested"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "distance": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "cancelled_at",
+                    "categories",
+                    "created_at",
+                    "created_by",
+                    "distance",
+                    "hero_image",
+                    "id",
+                    "organization",
+                    "promoted_from",
+                    "published_at",
+                    "source",
+                    "starts_at",
+                    "status",
+                    "title",
+                    "updated_at",
+                    "venue"
+                ]
+            },
+            "EventObservation": {
+                "type": "object",
+                "description": "Full read of an observation (listing / admin / retrieval).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "source": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "run": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/StatusF3dEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "title": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true,
+                        "description": "Observed original URL."
+                    },
+                    "platform": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Observed original platform."
+                    },
+                    "attendance_mode": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/AttendanceModeEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "event_type": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/EventTypeEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "venue_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "venue_address": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "venue_city": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "latitude": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "longitude": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "reviewed_by": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "reviewed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "review_note": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "attendance_mode",
+                    "created_at",
+                    "description",
+                    "ends_at",
+                    "event_type",
+                    "id",
+                    "latitude",
+                    "longitude",
+                    "platform",
+                    "review_note",
+                    "reviewed_at",
+                    "reviewed_by",
+                    "run",
+                    "source",
+                    "starts_at",
+                    "status",
+                    "title",
+                    "updated_at",
+                    "url",
+                    "venue_address",
+                    "venue_city",
+                    "venue_name"
+                ]
+            },
+            "EventObservationNested": {
+                "type": "object",
+                "description": "Minimal read-only view of an observation, used on ``Event.promoted_from``.\n\nDeliberately small so the canonical-event payload can't recurse into the\nfull observation graph.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "title": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true,
+                        "description": "Observed original URL."
+                    },
+                    "platform": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Observed original platform."
+                    },
+                    "status": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/StatusF3dEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "platform",
+                    "starts_at",
+                    "status",
+                    "title",
+                    "url"
+                ]
+            },
+            "EventObservationSubmit": {
+                "type": "object",
+                "description": "The extractor's submit payload for a single observation.\n\n``source`` is required (which source the observation came from); ``run`` is\noptional (set when reporting inside a run). ``status`` is forced to\n``pending`` — the extractor can never self-promote. ``latitude`` /\n``longitude`` are write-only and stored as ``location``.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "source": {
+                        "type": "integer"
+                    },
+                    "run": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/StatusF3dEnum"
+                    },
+                    "raw_payload": {},
+                    "title": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Observed original URL.",
+                        "maxLength": 200
+                    },
+                    "platform": {
+                        "type": "string",
+                        "description": "Observed original platform.",
+                        "maxLength": 80
+                    },
+                    "attendance_mode": {
+                        "$ref": "#/components/schemas/AttendanceModeEnum"
+                    },
+                    "event_type": {
+                        "$ref": "#/components/schemas/EventTypeEnum"
+                    },
+                    "venue_name": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "venue_address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "venue_city": {
+                        "type": "string",
+                        "maxLength": 100
+                    }
+                },
+                "required": [
+                    "id",
+                    "source",
+                    "starts_at",
+                    "title"
+                ]
+            },
+            "EventObservationSubmitRequest": {
+                "type": "object",
+                "description": "The extractor's submit payload for a single observation.\n\n``source`` is required (which source the observation came from); ``run`` is\noptional (set when reporting inside a run). ``status`` is forced to\n``pending`` — the extractor can never self-promote. ``latitude`` /\n``longitude`` are write-only and stored as ``location``.",
+                "properties": {
+                    "source": {
+                        "type": "integer"
+                    },
+                    "run": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/StatusF3dEnum"
+                    },
+                    "raw_payload": {},
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Observed original URL.",
+                        "maxLength": 200
+                    },
+                    "platform": {
+                        "type": "string",
+                        "description": "Observed original platform.",
+                        "maxLength": 80
+                    },
+                    "attendance_mode": {
+                        "$ref": "#/components/schemas/AttendanceModeEnum"
+                    },
+                    "event_type": {
+                        "$ref": "#/components/schemas/EventTypeEnum"
+                    },
+                    "venue_name": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "venue_address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "venue_city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "writeOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "source",
+                    "starts_at",
+                    "title"
+                ]
+            },
+            "EventRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "event_type": {
+                        "$ref": "#/components/schemas/EventTypeEnum"
+                    },
+                    "attendance_mode": {
+                        "$ref": "#/components/schemas/AttendanceModeEnum"
+                    },
+                    "original_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 200
+                    },
+                    "original_platform": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "owner_group_id": {
+                        "type": "integer",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "category_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "writeOnly": true
+                        },
+                        "writeOnly": true
+                    },
+                    "venue_id": {
+                        "type": "integer",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "organization_id": {
+                        "type": "integer",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "writeOnly": true,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "starts_at",
+                    "title"
+                ]
+            },
+            "EventSourceNested": {
+                "type": "object",
+                "description": "Minimal read-only view of an event source, used on ``Event.source``.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true
+                    },
+                    "platform": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "Where the source lives, e.g. 'meetup', 'eventbrite', 'homepage'."
+                    }
+                },
+                "required": [
+                    "id",
+                    "platform",
+                    "url"
+                ]
+            },
+            "EventStatusEnum": {
+                "enum": [
+                    "draft",
+                    "published",
+                    "cancelled",
+                    "archived"
+                ],
+                "type": "string",
+                "description": "* `draft` - Draft\n* `published` - Published\n* `cancelled` - Cancelled\n* `archived` - Archived"
+            },
+            "EventTypeEnum": {
+                "enum": [
+                    "meetup",
+                    "conference",
+                    "workshop",
+                    "social",
+                    "other"
+                ],
+                "type": "string",
+                "description": "* `meetup` - Meetup\n* `conference` - Conference\n* `workshop` - Workshop\n* `social` - Social\n* `other` - Other"
+            },
+            "IngestionRun": {
+                "type": "object",
+                "description": "Report an ingestion run.\n\nOn create, ``status`` defaults to ``running`` and ``reported_by`` is set by\nthe view to the calling service account. The extractor later PATCHes the run\nto ``succeeded`` / ``failed`` with ``finished_at`` / ``events_found`` /\n``error_message``.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "source": {
+                        "type": "integer"
+                    },
+                    "started_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "finished_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/IngestionRunStatusEnum"
+                    },
+                    "events_found": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0
+                    },
+                    "events_promoted": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "error_message": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "events_promoted",
+                    "id",
+                    "source"
+                ]
+            },
+            "IngestionRunRequest": {
+                "type": "object",
+                "description": "Report an ingestion run.\n\nOn create, ``status`` defaults to ``running`` and ``reported_by`` is set by\nthe view to the calling service account. The extractor later PATCHes the run\nto ``succeeded`` / ``failed`` with ``finished_at`` / ``events_found`` /\n``error_message``.",
+                "properties": {
+                    "source": {
+                        "type": "integer"
+                    },
+                    "started_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "finished_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/IngestionRunStatusEnum"
+                    },
+                    "events_found": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0
+                    },
+                    "error_message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "source"
+                ]
+            },
+            "IngestionRunStatusEnum": {
+                "enum": [
+                    "pending",
+                    "running",
+                    "succeeded",
+                    "failed"
+                ],
+                "type": "string",
+                "description": "* `pending` - Pending\n* `running` - Running\n* `succeeded` - Succeeded\n* `failed` - Failed"
+            },
+            "OrganizationPublic": {
+                "type": "object",
+                "description": "Public, read-only representation of an organization (catalog face).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "website": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 200
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ]
+            },
+            "OrganizationPublicRequest": {
+                "type": "object",
+                "description": "Public, read-only representation of an organization (catalog face).",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "website": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 200
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "PaginatedAPIKeyList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/APIKey"
+                        }
+                    }
+                }
+            },
+            "PaginatedCategoryList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Category"
+                        }
+                    }
+                }
+            },
+            "PaginatedCityList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/City"
+                        }
+                    }
+                }
+            },
+            "PaginatedDueSourceList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DueSource"
+                        }
+                    }
+                }
+            },
+            "PaginatedEventList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Event"
+                        }
+                    }
+                }
+            },
+            "PaginatedEventObservationList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/EventObservation"
+                        }
+                    }
+                }
+            },
+            "PaginatedIngestionRunList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/IngestionRun"
+                        }
+                    }
+                }
+            },
+            "PaginatedOrganizationPublicList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganizationPublic"
+                        }
+                    }
+                }
+            },
+            "PaginatedVenueList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Venue"
+                        }
+                    }
+                }
+            },
+            "PatchedCategoryRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                    }
+                }
+            },
+            "PatchedEventRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "event_type": {
+                        "$ref": "#/components/schemas/EventTypeEnum"
+                    },
+                    "attendance_mode": {
+                        "$ref": "#/components/schemas/AttendanceModeEnum"
+                    },
+                    "original_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "maxLength": 200
+                    },
+                    "original_platform": {
+                        "type": "string",
+                        "maxLength": 80
+                    },
+                    "owner_group_id": {
+                        "type": "integer",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "category_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "writeOnly": true
+                        },
+                        "writeOnly": true
+                    },
+                    "venue_id": {
+                        "type": "integer",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "organization_id": {
+                        "type": "integer",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "double",
+                        "writeOnly": true,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "double",
+                        "writeOnly": true,
+                        "nullable": true
+                    }
+                }
+            },
+            "PatchedIngestionRunRequest": {
+                "type": "object",
+                "description": "Report an ingestion run.\n\nOn create, ``status`` defaults to ``running`` and ``reported_by`` is set by\nthe view to the calling service account. The extractor later PATCHes the run\nto ``succeeded`` / ``failed`` with ``finished_at`` / ``events_found`` /\n``error_message``.",
+                "properties": {
+                    "source": {
+                        "type": "integer"
+                    },
+                    "started_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "finished_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/IngestionRunStatusEnum"
+                    },
+                    "events_found": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0
+                    },
+                    "error_message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PatchedVenueRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    }
+                }
+            },
+            "StatusF3dEnum": {
+                "enum": [
+                    "pending",
+                    "accepted",
+                    "rejected",
+                    "promoted"
+                ],
+                "type": "string",
+                "description": "* `pending` - Pending\n* `accepted` - Accepted\n* `rejected` - Rejected\n* `promoted` - Promoted"
+            },
+            "TokenObtainPair": {
+                "type": "object",
+                "properties": {
+                    "access": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "refresh": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "access",
+                    "refresh"
+                ]
+            },
+            "TokenObtainPairRequest": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "writeOnly": true,
+                        "minLength": 1
+                    },
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true,
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "password",
+                    "username"
+                ]
+            },
+            "TokenRefresh": {
+                "type": "object",
+                "properties": {
+                    "access": {
+                        "type": "string",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "access"
+                ]
+            },
+            "TokenRefreshRequest": {
+                "type": "object",
+                "properties": {
+                    "refresh": {
+                        "type": "string",
+                        "writeOnly": true,
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "refresh"
+                ]
+            },
+            "Venue": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "latitude": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "longitude": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "latitude",
+                    "longitude",
+                    "name"
+                ]
+            },
+            "VenueRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    },
+                    "address": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "_OrganizationMini": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "slug": {
+                        "type": "string",
+                        "readOnly": true,
+                        "pattern": "^[-a-zA-Z0-9_]+$"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ]
+            }
+        },
+        "securitySchemes": {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "sessionid"
+            },
+            "jwtAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Cities",
+            "description": "City gazetteer catalog + ?near_city= resolution."
+        },
+        {
+            "name": "Events",
+            "description": "Canonical events: list, filters, proximity, lifecycle."
+        },
+        {
+            "name": "Organizations",
+            "description": "Public organization catalog."
+        },
+        {
+            "name": "Venues",
+            "description": "Venue catalog."
+        },
+        {
+            "name": "Categories",
+            "description": "Event category catalog."
+        },
+        {
+            "name": "Auth",
+            "description": "Registration, JWT, session, API keys."
+        },
+        {
+            "name": "Ingestion",
+            "description": "Extractor-facing ingestion surface."
+        }
+    ]
+}
