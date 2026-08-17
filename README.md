@@ -121,12 +121,30 @@ two steps above after any backend serializer change.
 
 ```bash
 docker build -t terminschleuder-demo .
-docker run -p 8080:80 terminschleuder-demo
+docker run -p 8080:8080 terminschleuder-demo
 # open http://localhost:8080, set the API URL in Settings
 ```
 
+The runtime image is `nginxinc/nginx-unprivileged` (non-root, listens on 8080 — no
+privileged port binding).
+
 The image is origin-agnostic (the API URL is set in the browser), so the same
 build runs against a local, staging, or prod backend.
+
+### Container images & releases
+
+CI (`.github/workflows/ci.yml`) typechecks, lints, tests, and builds on every push to
+`main`/`develop`, every tag, and every PR. The image is published to the **GitHub
+Container Registry** only when a commit lands on `main` (an accepted PR, once `main` is
+branch-protected) or a release tag is pushed:
+
+```bash
+docker pull ghcr.io/terminschleuder/frontend:latest
+docker pull ghcr.io/terminschleuder/frontend:0.1alpha
+```
+
+Development follows a `develop` → `main` cycle: work lands on `develop`, PRs to `main`
+build and publish. Direct pushes to `main` are blocked by branch protection.
 
 ## What the demo shows (every unauthenticated capability)
 
