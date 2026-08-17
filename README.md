@@ -119,10 +119,19 @@ two steps above after any backend serializer change.
 
 ## Run with Docker
 
+The published image is all you need — **no clone required**. Pull it and run:
+
+```bash
+docker pull ghcr.io/terminschleuder/frontend:latest
+docker run -p 8080:8080 ghcr.io/terminschleuder/frontend:latest
+# open http://localhost:8080, set the API URL in Settings
+```
+
+To build from source instead (e.g. for an unreleased change):
+
 ```bash
 docker build -t terminschleuder-demo .
 docker run -p 8080:8080 terminschleuder-demo
-# open http://localhost:8080, set the API URL in Settings
 ```
 
 The runtime image is `nginxinc/nginx-unprivileged` (non-root, listens on 8080 — no
@@ -140,7 +149,7 @@ branch-protected) or a release tag is pushed:
 
 ```bash
 docker pull ghcr.io/terminschleuder/frontend:latest
-docker pull ghcr.io/terminschleuder/frontend:0.1alpha
+docker pull ghcr.io/terminschleuder/frontend:0.3alpha
 ```
 
 Development follows a `develop` → `main` cycle: work lands on `develop`, PRs to `main`
