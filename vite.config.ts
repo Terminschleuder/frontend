@@ -20,13 +20,19 @@ export default defineConfig({
         // Split the framework into a long-cacheable vendor chunk. Leaflet is
         // NOT listed here on purpose — it lives in the lazy `MapView` chunk
         // so it is only downloaded when a map is actually shown.
-        manualChunks: {
-          vendor: [
-            "react",
-            "react-dom",
-            "react-router-dom",
-            "@tanstack/react-query",
-          ],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            const vendorPkgs = [
+              "react",
+              "react-dom",
+              "react-router-dom",
+              "@tanstack/react-query",
+            ];
+            if (vendorPkgs.some((p) => id.includes(`/node_modules/${p}/`))) {
+              return "vendor";
+            }
+          }
+          return undefined;
         },
       },
     },

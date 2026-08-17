@@ -14,13 +14,21 @@ updates:
         dependency-type: "production"
       development:
         dependency-type: "development"
-    # Temporarily ignore these major bumps — their peer chains are not yet
-    # eslint-10 / vite-8 compatible, so the PRs fail npm ci with ERESOLVE.
-    # Drop these ignore entries once the ecosystem catches up.
+    # Temporarily ignore these major bumps — typescript-eslint does not yet
+    # support TypeScript 7 or eslint 10 (tracking: typescript-eslint#10940),
+    # so TS 7 / eslint 10 / @eslint/js 10 break `tsc`/lint, and
+    # eslint-plugin-react-hooks 7 changed its config shape alongside that.
+    # @vitejs/plugin-react 6 is now USED (vite 8 below satisfies its peer) so
+    # it is NOT ignored. Drop these entries once typescript-eslint supports
+    # TS 7 / eslint 10.
     ignore:
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
-      - dependency-name: "@vitejs/plugin-react"
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint-plugin-react-hooks"
         update-types: ["version-update:semver-major"]
 
   # Base image (Dockerfile).
