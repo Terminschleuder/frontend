@@ -14,6 +14,14 @@ updates:
         dependency-type: "production"
       development:
         dependency-type: "development"
+    # Temporarily ignore these major bumps — their peer chains are not yet
+    # eslint-10 / vite-8 compatible, so the PRs fail npm ci with ERESOLVE.
+    # Drop these ignore entries once the ecosystem catches up.
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitejs/plugin-react"
+        update-types: ["version-update:semver-major"]
 
   # Base image (Dockerfile).
   - package-ecosystem: docker
