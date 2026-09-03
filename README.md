@@ -143,13 +143,15 @@ build runs against a local, staging, or prod backend.
 ### Container images & releases
 
 CI (`.github/workflows/ci.yml`) typechecks, lints, tests, and builds on every push to
-`main`/`develop`, every tag, and every PR. The image is published to the **GitHub
-Container Registry** only when a commit lands on `main` (an accepted PR, once `main` is
-branch-protected) or a release tag is pushed:
+`main`/`develop`, every tag, and every PR. Every commit that lands on `main` cuts a
+**CalVer release** (`YYYY.MINOR.0`, git tag `vYYYY.MINOR.0`): the release job versions,
+builds & pushes the image to the **GitHub Container Registry** tagged `<release-version>`,
+`latest`, and `sha-<short>`, scans it with Trivy, then creates the git tag + GitHub
+Release. PRs and `develop` pushes never publish:
 
 ```bash
 docker pull ghcr.io/terminschleuder/frontend:latest
-docker pull ghcr.io/terminschleuder/frontend:0.3alpha
+docker pull ghcr.io/terminschleuder/frontend:<release-version>
 ```
 
 Development follows a `develop` → `main` cycle: work lands on `develop`, PRs to `main`
