@@ -93,14 +93,14 @@ Key points:
 
 | Layer | Choice | Notes |
 | --- | --- | --- |
-| Build | Vite 6 | dev server + production bundler |
+| Build | Vite 8 | dev server + production bundler |
 | UI | React 19 + TypeScript (`strict`) | React Router v7 |
 | Data | TanStack Query v5 | caching, pagination, loading/error/empty states |
 | Styling | Tailwind CSS v4 | shadcn-style primitives, dark mode toggle |
 | Maps | react-leaflet v5 + Leaflet | OpenStreetMap tiles, geolocation; **lazy-loaded** |
 | Validation | zod | runtime response-shape validation (drift detector) |
 | Types | openapi-typescript | generated from backend OpenAPI → `src/api/schema.ts` |
-| Tests | Vitest 3 + RTL + MSW | jsdom; MSW mocks the API |
+| Tests | Vitest 4 + RTL + MSW | jsdom; MSW mocks the API |
 | Serve | nginx (multi-stage Docker) | static `dist/`, SPA fallback, gzip, asset caching |
 
 > **`vitest`'s major must stay in sync with `vite`'s major** — they share a transform
@@ -142,15 +142,19 @@ A committed `openapi.json` keeps the build working offline. After regenerating, 
 - **Coverage areas**: API client, config/onboarding, formatters, the combobox, hero
   fallback, and the Cities/Events pages end-to-end (with MSW fixtures in `handlers.ts`).
 - **CI** (`.github/workflows/ci.yml`): Node 22 → `npm ci` → `typecheck` → `lint` → `test`
-  → `build`, uploading the `dist/` artifact. Mirrors the local gate exactly.
+  → `build`, uploading the `dist/` artifact. Mirrors the local gate exactly. Every commit
+  that lands on `main` cuts a **CalVer release** (`YYYY.MINOR.0`, git tag `vYYYY.MINOR.0`):
+  the release job versions, builds & pushes the image to ghcr.io tagged
+  `<release-version>`/`latest`/`sha-<short>`, scans it with Trivy, then creates the git
+  tag + GitHub Release. PRs and `develop` pushes never publish.
 
 ## Container & project layout
 
 ```mermaid
 flowchart TB
   subgraph Dockerfile
-    Build[node:22-alpine<br/>npm ci + npm run build]
-    Run[nginx:alpine<br/>serves dist/]
+    Build[node:26-alpine<br/>npm ci + npm run build]
+    Run[nginx-unprivileged:alpine<br/>serves dist/ on :8080]
   end
   Build -->|copy dist/| Run
 ```
