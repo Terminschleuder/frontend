@@ -257,4 +257,5 @@ openapi.json    committed backend schema (offline codegen)
 
 ## License
 
-Apache License 2.0 — see [`LICENSE`](LICENSE).
+Apache License 2.0 — see [`LICENSE`](LICENSE). Third-party libraries and their
+licenses are inventoried in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
