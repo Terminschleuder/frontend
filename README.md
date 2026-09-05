@@ -29,6 +29,7 @@ rebuild needed to retarget.
 - [Scripts](#scripts)
 - [Regenerating types](#regenerating-types)
 - [Run with Docker](#run-with-docker)
+- [Deploy on a container hoster](#deploy-on-a-container-hoster)
 - [What the demo shows](#what-the-demo-shows-every-unauthenticated-capability)
 - [Configuration](#configuration)
 - [Documentation](#documentation)
@@ -139,6 +140,44 @@ privileged port binding).
 
 The image is origin-agnostic (the API URL is set in the browser), so the same
 build runs against a local, staging, or prod backend.
+
+## Deploy on a container hoster
+
+For a hoster that runs containers **without docker compose** — an
+app-platform-style UI (deploy by image, per-app env panel) or a plain host
+where you `docker run` yourself — this container is the simplest of the four:
+
+| Field | Value |
+| --- | --- |
+| Image | `ghcr.io/terminschleuder/frontend:<release-version>` (pin it — see [Container images & releases](#container-images--releases)) |
+| Env vars | **none — the env panel can stay empty.** This image takes zero runtime env vars. |
+| Port | `8080` (publish/route it as the app's HTTP port) |
+| Volume | none |
+| Links to other containers | **none.** The frontend never talks to the backend — the *browser* calls the backend's public URL directly, with the API base URL set in the app's Settings page (stored in the browser's localStorage). |
+
+That means: deploy the image, route port `8080`, done — the same image runs
+against any backend.
+
+Two follow-ups that live on the **backend**, not here:
+
+- **Set the API base URL** — open the deployed app, go to Settings, and point
+  it at your backend's public URL (e.g. `https://api.example.com`). The event
+  list filling in is your deployment smoke test.
+- **CORS** — because the browser (not the frontend container) calls the
+  backend, the backend must allow the frontend's origin. The backend's
+  default `CORS_ALLOW_ALL_ORIGINS=True` does; see the backend README if you
+  want to restrict it.
+
+Plain-host equivalent of the UI steps above:
+
+```bash
+docker run -d --name ts-app --restart unless-stopped \
+  -p 8080:8080 ghcr.io/terminschleuder/frontend:<release-version>
+```
+
+For the full four-container story (db → backend → frontend → extractor,
+start order, verification, troubleshooting), see the backend's
+[deployment guide](https://github.com/Terminschleuder/backend/blob/main/docs/deployment.md).
 
 ### Container images & releases
 
