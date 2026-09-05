@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useApiConfig } from "@/config/useApiConfig";
 import { useConnectionTest } from "@/hooks/useConnectionTest";
@@ -30,7 +30,15 @@ export function SettingsPage() {
   const [draft, setDraft] = useState(baseUrl);
   const test = useConnectionTest();
 
-  useEffect(() => setDraft(baseUrl), [baseUrl]);
+  // Keep the draft in sync when the stored base URL changes externally
+  // (e.g. "Reset to default"). React's recommended pattern is to adjust
+  // state during render with previous-value tracking rather than an effect.
+  // https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [prevBaseUrl, setPrevBaseUrl] = useState(baseUrl);
+  if (prevBaseUrl !== baseUrl) {
+    setPrevBaseUrl(baseUrl);
+    setDraft(baseUrl);
+  }
 
   const save = () => {
     const trimmed = draft.trim().replace(/\/+$/, "");
